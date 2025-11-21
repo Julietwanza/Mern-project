@@ -1,12 +1,221 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SDG CleanWater</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>SDG Clean Water – AI Powered</title>
+
+  <!-- SEO Meta -->
+  <meta name="description" content="A MERN-powered SDG Clean Water platform enhanced with AI insights and interactive features." />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Basic Styling -->
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom, #e0f7ff, #ffffff);
+      height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* GLOBAL FADE ANIMATION */
+    .fade-in {
+      animation: fadeIn 1.2s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* LOADING SCREEN */
+    #loading-screen {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: #0ea5e9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      font-size: 22px;
+      z-index: 9999;
+      animation: splashFadeOut 2.4s ease forwards;
+    }
+
+    @keyframes splashFadeOut {
+      0% { opacity: 1; }
+      70% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+
+    .water-loader {
+      border: 6px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* AI Chat Widget */
+    #ai-widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 330px;
+      height: 420px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(130%);
+      transition: 0.4s;
+    }
+
+    #ai-widget.open {
+      transform: translateY(0%);
+    }
+
+    #ai-header {
+      background: #0ea5e9;
+      color: white;
+      padding: 12px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    #ai-messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    #ai-input-box {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+
+    #ai-input {
+      flex: 1;
+      border: none;
+      padding: 10px;
+      outline: none;
+    }
+
+    #ai-send {
+      background: #0ea5e9;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+
+    /* AI Floating Button */
+    #ai-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: #0ea5e9;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      transition: 0.3s;
+    }
+
+    #ai-button:hover {
+      transform: scale(1.1);
+    }
+  </style>
 </head>
+
 <body>
-<div id="root"></div>
-<script type="module" src="/src/main.jsx"></script>
+
+  <!-- LOADING SCREEN -->
+  <div id="loading-screen">
+    <div class="water-loader"></div>
+    Loading Clean Water Insights…
+  </div>
+
+  <!-- ROOT FOR REACT APP -->
+  <div id="root" class="fade-in"></div>
+
+  <!-- AI FLOATING BUTTON -->
+  <div id="ai-button">💧</div>
+
+  <!-- AI CHAT WIDGET -->
+  <div id="ai-widget">
+    <div id="ai-header">WaterAI Assistant</div>
+    <div id="ai-messages"></div>
+    <div id="ai-input-box">
+      <input id="ai-input" placeholder="Ask about SDG6, water quality…" />
+      <button id="ai-send">→</button>
+    </div>
+  </div>
+
+  <!-- VITE ENTRY -->
+  <script type="module" src="/src/main.jsx"></script>
+
+  <!-- AI CHAT WIDGET JS -->
+  <script>
+    const aiBtn = document.getElementById('ai-button');
+    const aiWidget = document.getElementById('ai-widget');
+    const aiSend = document.getElementById('ai-send');
+    const aiMsgBox = document.getElementById('ai-messages');
+    const aiInput = document.getElementById('ai-input');
+
+    aiBtn.onclick = () => {
+      aiWidget.classList.toggle('open');
+    };
+
+    async function sendAI() {
+      const message = aiInput.value.trim();
+      if (!message) return;
+
+      // display user message
+      aiMsgBox.innerHTML += `<div><b>You:</b> ${message}</div>`;
+      aiInput.value = "";
+
+      // Call your backend AI route (OpenAI, Gemini, local model, etc.)
+      const res = await fetch("https://your-backend-url.onrender.com/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: message })
+      });
+
+      const data = await res.json();
+
+      aiMsgBox.innerHTML += `<div><b>WaterAI:</b> ${data.reply}</div>`;
+      aiMsgBox.scrollTop = aiMsgBox.scrollHeight;
+    }
+
+    aiSend.onclick = sendAI;
+    aiInput.addEventListener("keyup", (e) => {
+      if (e.key === "Enter") sendAI();
+    });
+  </script>
+
 </body>
 </html>
